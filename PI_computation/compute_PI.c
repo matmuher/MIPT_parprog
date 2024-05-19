@@ -7,29 +7,6 @@
 #include "Work.h"
 #include "MPIWrap.h"
 
-void print(Worker worker)
-{
-  printf(
-        "\n"
-        "Rank: %d\n"
-        "World: %d\n",
-        worker.rank, worker.worldSize);
-}
-
-void print(Worker worker, Work work)
-{
-  printf(
-        "\n"
-        "Rank: %d\n"
-        "Sample: %d\n"
-        "LeftUp: %lg\n"
-        "RightDown: %lg\n"
-        "\n",
-        worker.rank,
-        work.sampleNum,     
-        work.area.leftUp.y, work.area.rightDown.y);
-}
-
 const int RootRank = 0;
 
 int* createRecvArray(Worker worker)
@@ -50,7 +27,6 @@ void programMPI(void)
   Worker worker = initWorker();
 
   Work work = getWork(worker);
-//  print(worker, work);
 
   int circleNum = doWork(work);
 
@@ -71,7 +47,7 @@ void programMPI(void)
 
     printf("SUM: %d\n", sum);
 
-    double pi = 4. * (sum / double(GlobalSampleNum));
+    double pi = SquareArea * (sum / double(GlobalSampleNum));
 
     printf("pi = %lg\n", pi);
 

@@ -38,7 +38,15 @@ const Vec LeftUp = Vec{-1., 1.};
 const Vec RightDown = Vec{1., -1.};
 const double sqR = 1.;
 
-const int GlobalSampleNum = 1000;
+const double SquareArea = (RightDown.x - LeftUp.x) * (LeftUp.y - RightDown.y);
+
+// const int GlobalSampleNum = 1000;
+
+#ifndef GlobalSampleNum
+
+#define GlobalSampleNum 1000
+
+#endif
 
 Work getWork(Worker worker)
 {
