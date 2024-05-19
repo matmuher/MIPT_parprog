@@ -1,15 +1,16 @@
-EXECS=compute_PI.exe
+EXEC=compute_PI.exe
+SRC=compute_PI.c
 MPICC?=mpic++
 SLOTS=4
 
-all: ${EXECS}
+all: ${EXEC}
 
-compute_PI.exe : compute_PI.c
+${EXEC} : ${SRC}
 	${MPICC} -o $@ $^
 
-run: compute_PI.exe
+run: ${EXEC}
 
-	mpirun --oversubscribe -n ${SLOTS} ./compute_PI.exe
+	mpirun --oversubscribe -n ${SLOTS} ${EXEC}
 
 clean:
-	rm ${EXECS}
+	rm ${EXEC}

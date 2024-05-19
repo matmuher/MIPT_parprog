@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdlib.h>
+#include <time.h>
 
 #include "Worker.h"
 
@@ -49,8 +50,8 @@ Work getWork(Worker worker)
   const double yStep =  yWidth / worker.worldSize;
 
   Area workArea{
-    .leftUp = Vec{LeftUp.x,  yStep * worker.rank},
-    .rightDown = Vec{RightDown.x, yStep * (worker.rank + 1)}
+    .leftUp = Vec{LeftUp.x, RightDown.y + yStep * worker.rank + yStep},
+    .rightDown = Vec{RightDown.x, RightDown.y + yStep * worker.rank}
   };
 
   work.area = workArea;
@@ -58,9 +59,17 @@ Work getWork(Worker worker)
   return work;
 }
 
+bool initRand()
+{
+  srand(time(NULL));
+
+  return true;
+}
+
 double getRandFloat()
 {
-  // TODO: add seed
+  static bool isInit = initRand();
+
   return double(rand()) / RAND_MAX;
 }
 

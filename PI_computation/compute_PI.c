@@ -1,38 +1,81 @@
 #include <mpi.h>
 #include <stdio.h>
 #include <assert.h>
+#include <stdlib.h>
 
 #include "Worker.h"
 #include "Work.h"
 #include "MPIWrap.h"
+
+void print(Worker worker)
+{
+  printf(
+        "\n"
+        "Rank: %d\n"
+        "World: %d\n",
+        worker.rank, worker.worldSize);
+}
+
+void print(Worker worker, Work work)
+{
+  printf(
+        "\n"
+        "Rank: %d\n"
+        "Sample: %d\n"
+        "LeftUp: %lg\n"
+        "RightDown: %lg\n"
+        "\n",
+        worker.rank,
+        work.sampleNum,     
+        work.area.leftUp.y, work.area.rightDown.y);
+}
+
+const int RootRank = 0;
+
+int* createRecvArray(Worker worker)
+{
+  int* arr = NULL;
+
+  if (worker.rank == RootRank)
+  {
+    arr = (int*) calloc(worker.worldSize, sizeof(int));
+    assert(arr != NULL);
+  }
+
+  return arr;
+}
 
 void programMPI(void)
 {
   Worker worker = initWorker();
 
   Work work = getWork(worker);
+//  print(worker, work);
 
   int circleNum = doWork(work);
 
-  switch(worker.rank)
-  {
-    case 0:
-    {
-      int recvNum = 0;
-      MPI_Recv(&recvNum, 1, MPI_INT, 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-      printf("recvNum = %d\n", recvNum);
-      break;
-    }
-    case 1:
-    {
-      int sendNum = 25;
-      MPI_Send(&sendNum, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
-      printf("sendNum = %d\n", sendNum);
-      break;
-    }
-    default:
+  int* arr = createRecvArray(worker);
 
-      printf("Worker [%d] is unemployed\n", worker.rank);
+  MPI_Gather(&circleNum, 1, MPI_INT,
+              arr, 1, MPI_INT,
+              RootRank,
+              MPI_COMM_WORLD);
+
+  if (worker.rank == RootRank)
+  {
+    int sum  = 0;
+    for (int area_id = 0; area_id < worker.worldSize; area_id++)
+    {
+      sum += arr[area_id];
+    }
+
+    printf("SUM: %d\n", sum);
+
+    double pi = 4. * (sum / double(GlobalSampleNum));
+
+    printf("pi = %lg\n", pi);
+
+    free(arr);
   }
 }
 
