@@ -3,9 +3,9 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include "Worker.h"
+#include "../Worker.h"
+#include "../MPIWrap.h"
 #include "Work.h"
-#include "MPIWrap.h"
 
 const int RootRank = 0;
 
@@ -22,7 +22,7 @@ int* createRecvArray(Worker worker)
   return arr;
 }
 
-void programMPI(void)
+void programMPI(int argc, char** argv)
 {
   Worker worker = initWorker();
 
@@ -57,5 +57,5 @@ void programMPI(void)
 
 int main(int argc, char** argv)
 {
-  doProgramMPI(programMPI);
+  doProgramMPI(programMPI, argc, argv);
 }
